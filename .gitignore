@@ -1,8 +1,13 @@
 # VSCode
-
 .vscode
+
 # virtualenv
 .Python
 bin
 include
 lib
+
+# Credentials
+credentials.json
+token.json
+e-ink_home_display-*.json
