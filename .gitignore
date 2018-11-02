@@ -2,6 +2,7 @@
 .vscode
 
 # virtualenv
+__pycache__
 .Python
 bin
 include
