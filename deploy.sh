@@ -1,0 +1,1 @@
+rsync . -avr --exclude '.git' pi@10.0.0.98:/home/pi/python_programs/pi-cal
