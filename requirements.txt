@@ -1,0 +1,16 @@
+google-api-python-client
+oauth2client
+pillow
+python-dev  # brew
+python-spidev   # brew
+
+sudo apt-get update
+sudo apt-get install:
+- python-dev
+- python-smbus
+- python-serial
+- python-imaging
+- python-rpi.gpio
+- wiringpi
+- python-spidev
+- fonts-freefont-ttf
