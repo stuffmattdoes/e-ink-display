@@ -125,16 +125,16 @@ def draw():
         days_in_weeks = cal.monthdayscalendar(year, month)
 
         # Title
-        draw.text((20, 18 + calendar_top), '{} {}'.format(month_str, year), font = font(20, 'Regular'), fill = 0)
+        draw.text((24, calendar_top), '{} {}'.format(month_str, year), font = font(20, 'Regular'), fill = 0)
         
         # Weekdays
-        draw.text((28, 44 + calendar_top), 'Su', font = font(18, 'Bold'), fill = 0)
-        draw.text((60, 44 + calendar_top), 'M', font = font(18, 'Bold'), fill = 0)
-        draw.text((90, 44 + calendar_top), 'T', font = font(18, 'Bold'), fill = 0)
-        draw.text((112, 44 + calendar_top), 'W', font = font(18, 'Bold'), fill = 0)
-        draw.text((138, 44 + calendar_top), 'Th', font = font(18, 'Bold'), fill = 0)
-        draw.text((168, 44 + calendar_top), 'F', font = font(18, 'Bold'), fill = 0)
-        draw.text((190, 44 + calendar_top), 'S', font = font(18, 'Bold'), fill = 0)
+        draw.text((24, 30 + calendar_top), 'Su', font = font(18, 'Bold'), fill = 0)
+        draw.text((56, 30 + calendar_top), 'M', font = font(18, 'Bold'), fill = 0)
+        draw.text((82, 30 + calendar_top), 'T', font = font(18, 'Bold'), fill = 0)
+        draw.text((112, 30 + calendar_top), 'W', font = font(18, 'Bold'), fill = 0)
+        draw.text((138, 30 + calendar_top), 'Th', font = font(18, 'Bold'), fill = 0)
+        draw.text((168, 30 + calendar_top), 'F', font = font(18, 'Bold'), fill = 0)
+        draw.text((194, 30 + calendar_top), 'S', font = font(18, 'Bold'), fill = 0)
 
         date_height = 0
 
@@ -147,10 +147,10 @@ def draw():
 
                 if day == today:
                     draw.rectangle((
-                        24 + date_spacing,                   # x0
-                        70 + calendar_top + date_height,     # y0
-                        48 + date_spacing,                  # x1
-                        90  + calendar_top + date_height),  # y1
+                        20 + date_spacing,                   # x0
+                        56 + calendar_top + date_height,     # y0
+                        44 + date_spacing,                  # x1
+                        76  + calendar_top + date_height),  # y1
                     fill = 0)
                     font_weight = 'Bold'
                     font_fill = 255
@@ -161,7 +161,7 @@ def draw():
                 if day == 0:
                     day_text = '-'
                 
-                draw.text((28 + date_spacing, 70 + calendar_top + date_height), str(day_text), font = font(15, font_weight), fill = font_fill)
+                draw.text((24 + date_spacing, 56 + calendar_top + date_height), str(day_text), font = font(15, font_weight), fill = font_fill)
                 date_spacing += 28
             
             date_height += 22
