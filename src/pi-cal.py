@@ -11,16 +11,17 @@ import calendar
 import epd7in5
 import datetime
 import json
-import os
+# import os
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from pprint import pprint
 import requests
-import sys
+# import sys
+import time
 
-print(os.getcwd())  # current working directory, absolute path
-print(sys.argv[0])  # working directory
+# print(os.getcwd())  # current working directory, absolute path
+# print(sys.argv[0])  # working directory
 
 with open('./data.json') as f:
     events = json.load(f)
@@ -54,12 +55,12 @@ def auth():
     AUTH_URL = 'https://accounts.google.com/o/oauth2/device/code'
     CLIENT_ID = '635286573706-22bvqd3vc034afg5vn9nopi6n6jed7sn.apps.googleusercontent.com'
     CLIENT_SECRET = 'Mc17FgVoPBYoxxaIPlboNBYn'
-    GRANT_TYPE = 'http://oauth.net/grant_type/device/1.0.'
+    GRANT_TYPE = 'http://oauth.net/grant_type/device/1.0'
     SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'    # If modifying these scopes, delete the file token.json.
     TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
 
     # Initial request
-    r = requests.post(AUTH_URL, data = {
+    auth_response = requests.post(AUTH_URL, data = {
         'client_id': CLIENT_ID,
         'scope': SCOPES
     }).json()
@@ -72,24 +73,31 @@ def auth():
     #   'verification_url': 'https://www.google.com/device'
     # }
 
-    DEVICE_CODE = r['device_code']
+    DEVICE_CODE = auth_response['device_code']
 
     group_top = 116
 
     draw.text((24, group_top), 'Visit', font = getFont(18, 'Regular'), fill = 0)
-    draw.text((24, 32 + group_top), r['verification_url'], font = getFont(24, 'Bold'), fill = 0)
+    draw.text((24, 32 + group_top), auth_response['verification_url'], font = getFont(24, 'Bold'), fill = 0)
     draw.text((24, 90 + group_top), 'and enter', font = getFont(18, 'Regular'), fill = 0)
-    draw.text((24, 122 + group_top), r['user_code'], font = getFont(32, 'Bold'), fill = 0)
+    draw.text((24, 122 + group_top), auth_response['user_code'], font = getFont(32, 'Bold'), fill = 0)
 
     render()
 
-    # Token polling
-    # token = requests.post(TOKEN_URL, data = {
-    #     'client_id': CLIENT_ID,
-    #     'client_secret': CLIENT_SECRET,
-    #     'code': DEVICE_CODE,
-    #     'grant_type': GRANT_TYPE
-    # })
+    # interval = auth_response['interval']
+    interval = 30
+    time.sleep(interval)
+
+    def request_token():
+        # Token polling
+        return requests.post(TOKEN_URL, data = {
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'code': DEVICE_CODE,
+            'grant_type': GRANT_TYPE
+        })
+
+    token_response = request_token()
 
     # {
     #     "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
@@ -97,6 +105,22 @@ def auth():
     #     "token_type":"Bearer",
     #     "refresh_token":"1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
     # }
+
+    i = 0
+
+    while i < auth_response['expires_in'] and not token_response.ok:
+        token_response = request_token()
+        print(token_response.json())
+
+        if (token_response.ok):
+            break
+        else:
+            time.sleep(interval)
+            i += interval
+
+    # print(token_response.elapsed.total_seconds(), token_response.status_code, token_response.ok)
+    token = token_response.json()
+    pprint(token)
 
 
 def fetchEvents():
