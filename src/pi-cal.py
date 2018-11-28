@@ -70,10 +70,12 @@ def auth():
 
     DEVICE_CODE = r['device_code']
 
-    draw.text((24, 64), 'Visit', font = getFont(18, 'Regular'), fill = 0)
-    draw.text((24, 80), r['verification_url'], font = getFont(18, 'Bold'), fill = 0)
-    draw.text((24, 96), 'and enter', font = getFont(18, 'Regular'), fill = 0)
-    draw.text((24, 112), r['user_code'], font = getFont(18, 'Bold'), fill = 0)
+    group_top = 120
+
+    draw.text((24, group_top), 'Visit', font = getFont(18, 'Regular'), fill = 0)
+    draw.text((24, 32 + group_top), r['verification_url'], font = getFont(24, 'Bold'), fill = 0)
+    draw.text((24, 90 + group_top), 'and enter', font = getFont(18, 'Regular'), fill = 0)
+    draw.text((24, 122 + group_top), r['user_code'], font = getFont(32, 'Bold'), fill = 0)
 
     print(r)
 
