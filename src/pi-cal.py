@@ -10,63 +10,109 @@
 import calendar
 import epd7in5
 import datetime
-# from googleapiclient.discovery import build
-# from httplib2 import Http
 import json
-# from oauth2client import file, client, tools
 import os
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from pprint import pprint
+import requests
 import sys
 
-print(os.getcwd())
-print(sys.argv[0])
+print(os.getcwd())  # current working directory, absolute path
+print(sys.argv[0])  # working directory
 
 with open('./data.json') as f:
     events = json.load(f)
 
-# If modifying these scopes, delete the file token.json.
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-EPD_WIDTH = 640
-EPD_HEIGHT = 384
-
 def main():
-    fetchEvents()
-    # drawEvents()
+    init()
+    auth()
+    # fetchEvents()
+    # draw()
+
+def init():
+    global EPD_WIDTH
+    EPD_WIDTH = 640
+    global EPD_HEIGHT
+    EPD_HEIGHT = 384
+
+    # Initialize E-Paper Display inferface
+    global epd
+    epd = epd7in5.EPD()
+    epd.init()
+
+    # For simplicity, the arguments are explicit numerical coordinates
+    global image
+    image = Image.new('1', (EPD_WIDTH, EPD_HEIGHT), 1)    # 1: clear the frame
+    global draw
+    draw = ImageDraw.Draw(image)
+
+def auth():
+    print('auth')
+
+    AUTH_URL = 'https://accounts.google.com/o/oauth2/device/code'
+    CLIENT_ID = '635286573706-22bvqd3vc034afg5vn9nopi6n6jed7sn.apps.googleusercontent.com'
+    SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'    # If modifying these scopes, delete the file token.json.
+
+    r = requests.post(AUTH_URL, data = {
+        'client_id': CLIENT_ID,
+        'scope': SCOPES
+    }).json()
+
+    # {
+    #   'device_code': 'AH-1Ng1BzvzcVPXWrakudSRlaBkKTm5otqDWNT0u0p5J9mjXR1hMiS-rUS5D7Ss7LvDvAumcQReo_ME9N30vcEWiLbMQq0ORCw',
+    #   'expires_in': 1800,
+    #   'interval': 5,
+    #   'user_code': 'KQTW-SDMD',
+    #   'verification_url': 'https://www.google.com/device'
+    # # }
+
+    DEVICE_CODE = r['device_code']
+
+    draw.text((24, 64), 'Visit', font = getFont(18, 'Regular'), fill = 0)
+    draw.text((24, 80), r['verification_url'], font = getFont(18, 'Bold'), fill = 0)
+    draw.text((24, 96), 'and enter', font = getFont(18, 'Regular'), fill = 0)
+    draw.text((24, 112), r['user_code'], font = getFont(18, 'Bold'), fill = 0)
+
+    print(r)
+
+    render()
 
 def fetchEvents():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
-    """
-    store = file.Storage('token.json')
-    creds = store.get()
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('e-ink_home_display-dcb881b9fb01.json', SCOPES)
-        creds = tools.run_flow(flow, store)
-    service = build('calendar', 'v3', http=creds.authorize(Http()))
+    print('fetchEvents')
+    # Shows basic usage of the Google Calendar API.
+    # Prints the start and name of the next 10 events on the user's calendar.
 
-    # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    
-    print('Getting the upcoming 10 events')
-    
-    events_result = service.events().list(
-        calendarId='lkopeh0sr1m9svqcggd0pms2ug@group.calendar.google.com',
-        maxResults=10,
-        orderBy='startTime',
-        singleEvents=True,
-        timeMin=now
-    ).execute()
-    
-    global events
-    events = events_result.get('items', [])
+    # store = file.Storage('token.json')
+    # creds = store.get()
 
-    if not events:
-        print('No upcoming events found.')
+    # if not creds or creds.invalid:
+    #     flow = client.flow_from_clientsecrets('e-ink_home_display-dcb881b9fb01.json', SCOPES)
+    #     creds = tools.run_flow(flow, store)
+    # service = build('calendar', 'v3', http=creds.authorize(Http()))
+
+    # # Call the Calendar API
+    # now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     
-    for event in events: 
-        start = event['start'].get('dateTime', event['start'].get('date'))
+    # print('Getting the upcoming 10 events')
+    
+    # events_result = service.events().list(
+    #     calendarId='lkopeh0sr1m9svqcggd0pms2ug@group.calendar.google.com',
+    #     maxResults=10,
+    #     orderBy='startTime',
+    #     singleEvents=True,
+    #     timeMin=now
+    # ).execute()
+    
+    # global events
+    # events = events_result.get('items', [])
+
+    # if not events:
+    #     print('No upcoming events found.')
+    
+    # for event in events: 
+    #     start = event['start'].get('dateTime', event['start'].get('date'))
 
 def formatEvents(events):
     print('formatEvents')
@@ -90,23 +136,12 @@ def formatEvents(events):
 
     return events_format
 
+def getFont(size, weight):
+        return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
+
 def draw():
     print('drawEvents')
     
-    # Initialize E-Paper Display inferface
-    epd = epd7in5.EPD()
-    epd.init()
-    
-
-    # For simplicity, the arguments are explicit numerical coordinates
-    image = Image.new('1', (EPD_WIDTH, EPD_HEIGHT), 1)    # 1: clear the frame
-    draw = ImageDraw.Draw(image)
-
-    # Fonts
-    def font(size, weight):
-        return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
-    
-
     def drawCalendar():
         print('drawCalendar')
 
@@ -123,16 +158,16 @@ def draw():
         days_in_weeks = cal.monthdayscalendar(year, month)
 
         # Title
-        draw.text((24, calendar_top), '{} {}'.format(month_str, year), font = font(20, 'Regular'), fill = 0)
+        draw.text((24, calendar_top), '{} {}'.format(month_str, year), font = getFont(20, 'Regular'), fill = 0)
         
         # Weekdays
-        draw.text((24, 30 + calendar_top), 'Su', font = font(18, 'Bold'), fill = 0)
-        draw.text((56, 30 + calendar_top), 'M', font = font(18, 'Bold'), fill = 0)
-        draw.text((82, 30 + calendar_top), 'T', font = font(18, 'Bold'), fill = 0)
-        draw.text((112, 30 + calendar_top), 'W', font = font(18, 'Bold'), fill = 0)
-        draw.text((138, 30 + calendar_top), 'Th', font = font(18, 'Bold'), fill = 0)
-        draw.text((168, 30 + calendar_top), 'F', font = font(18, 'Bold'), fill = 0)
-        draw.text((194, 30 + calendar_top), 'S', font = font(18, 'Bold'), fill = 0)
+        draw.text((24, 30 + calendar_top), 'Su', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((56, 30 + calendar_top), 'M', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((82, 30 + calendar_top), 'T', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((112, 30 + calendar_top), 'W', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((138, 30 + calendar_top), 'Th', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((168, 30 + calendar_top), 'F', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((194, 30 + calendar_top), 'S', font = getFont(18, 'Bold'), fill = 0)
 
         date_height = 0
 
@@ -159,7 +194,7 @@ def draw():
                 if day == 0:
                     day_text = '-'
                 
-                draw.text((24 + date_spacing, 56 + calendar_top + date_height), str(day_text), font = font(15, font_weight), fill = font_fill)
+                draw.text((24 + date_spacing, 56 + calendar_top + date_height), str(day_text), font = getFont(15, font_weight), fill = font_fill)
                 date_spacing += 28
             
             date_height += 22
@@ -169,16 +204,16 @@ def draw():
         day = datetime.datetime.now().strftime('%A')
         date = datetime.datetime.now().strftime('%-d')
 
-        draw.text((24, 8), day, font = font(32, 'Regular'), fill = 0)
-        draw.text((24, 8), date, font = font(148, 'Regular'), fill = 0)
+        draw.text((24, 8), day, font = getFont(32, 'Regular'), fill = 0)
+        draw.text((24, 8), date, font = getFont(148, 'Regular'), fill = 0)
 
     def drawEvents():
         print('drawEvents')
         line_height = 16
 
         # Render "Today"
-        draw.text((260, 16), 'TODAY', font = font(15, 'Regular'), fill = 0)   # Day
-        draw.text((325, 16), 'Not much going on!', font = font(15, 'Italic'), fill = 0)  # Details
+        draw.text((260, 16), 'TODAY', font = getFont(15, 'Regular'), fill = 0)   # Day
+        draw.text((325, 16), 'Not much going on!', font = getFont(15, 'Italic'), fill = 0)  # Details
 
         events_format = formatEvents(events)
 
@@ -201,12 +236,12 @@ def draw():
                 week_day = int(event_datetime.strftime('%w'))
                 week_of = 6 - week_day
 
-                draw.text((325, 36 + line_height), event_month, font = font(15, 'Regular'), fill = 0)   # Month
+                draw.text((325, 36 + line_height), event_month, font = getFont(15, 'Regular'), fill = 0)   # Month
                 line_height += 16
 
             # Draw date & day
-            draw.text((255, 36 + line_height), event_date, font = font(42, 'Regular'), fill = 0)   # Date
-            draw.text((260, 88 + line_height), event_day, font = font(15, 'Regular'), fill = 0)   # Day
+            draw.text((255, 36 + line_height), event_date, font = getFont(42, 'Regular'), fill = 0)   # Date
+            draw.text((260, 88 + line_height), event_day, font = getFont(15, 'Regular'), fill = 0)   # Day
 
             for event in events_format[date]:
                 # print(event['summary'])
@@ -249,8 +284,8 @@ def draw():
                     event_location = event_location[0:20] + '...' 
                 
                 # Draw summary & details
-                draw.text((325, 48 + line_height), event_summary, font = font(15, 'Bold'), fill = 0)   # Summary
-                draw.text((325, 68 + line_height), event_time + event_location, font = font(15, 'Regular'), fill = 0)  # Details
+                draw.text((325, 48 + line_height), event_summary, font = getFont(15, 'Bold'), fill = 0)   # Summary
+                draw.text((325, 68 + line_height), event_time + event_location, font = getFont(15, 'Regular'), fill = 0)  # Details
 
                 line_height += 32
 
@@ -265,9 +300,11 @@ def draw():
     drawCalendar()
     drawDate()
     drawEvents()
+    render()
 
+def render():
     # Render
     epd.display_frame(epd.get_frame_buffer(image))
 
 if __name__ == '__main__':
-    draw()
+    main()
