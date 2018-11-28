@@ -53,8 +53,12 @@ def auth():
 
     AUTH_URL = 'https://accounts.google.com/o/oauth2/device/code'
     CLIENT_ID = '635286573706-22bvqd3vc034afg5vn9nopi6n6jed7sn.apps.googleusercontent.com'
+    CLIENT_SECRET = 'Mc17FgVoPBYoxxaIPlboNBYn'
+    GRANT_TYPE = 'http://oauth.net/grant_type/device/1.0.'
     SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'    # If modifying these scopes, delete the file token.json.
+    TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
 
+    # Initial request
     r = requests.post(AUTH_URL, data = {
         'client_id': CLIENT_ID,
         'scope': SCOPES
@@ -66,20 +70,34 @@ def auth():
     #   'interval': 5,
     #   'user_code': 'KQTW-SDMD',
     #   'verification_url': 'https://www.google.com/device'
-    # # }
+    # }
 
     DEVICE_CODE = r['device_code']
 
-    group_top = 120
+    group_top = 116
 
     draw.text((24, group_top), 'Visit', font = getFont(18, 'Regular'), fill = 0)
     draw.text((24, 32 + group_top), r['verification_url'], font = getFont(24, 'Bold'), fill = 0)
     draw.text((24, 90 + group_top), 'and enter', font = getFont(18, 'Regular'), fill = 0)
     draw.text((24, 122 + group_top), r['user_code'], font = getFont(32, 'Bold'), fill = 0)
 
-    print(r)
-
     render()
+
+    # Token polling
+    # token = requests.post(TOKEN_URL, data = {
+    #     'client_id': CLIENT_ID,
+    #     'client_secret': CLIENT_SECRET,
+    #     'code': DEVICE_CODE,
+    #     'grant_type': GRANT_TYPE
+    # })
+
+    # {
+    #     "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
+    #     "expires_in":3920,
+    #     "token_type":"Bearer",
+    #     "refresh_token":"1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
+    # }
+
 
 def fetchEvents():
     print('fetchEvents')
