@@ -14,18 +14,17 @@ import datetime
 # from httplib2 import Http
 import json
 # from oauth2client import file, client, tools
-# import os
+import os
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from pprint import pprint
-# import sys
+import sys
 
-with open('data.json') as f:
+print(os.getcwd())
+print(sys.argv[0])
+
+with open('./data.json') as f:
     events = json.load(f)
-
-# print(os.getcwd())
-# print(sys.platform)
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
@@ -89,7 +88,6 @@ def formatEvents(events):
         except:
             events_format[event_YMD] = [event]
 
-    # pprint(events_format)
     return events_format
 
 def draw():
@@ -106,11 +104,11 @@ def draw():
 
     # Fonts
     def font(size, weight):
-        return ImageFont.truetype('/home/pi/python_programs/pi-cal/fonts/OpenSans-{}.ttf'.format(weight), size)
+        return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
     
 
     def drawCalendar():
-        print('drawEvents')
+        print('drawCalendar')
 
         now = datetime.datetime.now()
         today = now.day
@@ -149,7 +147,7 @@ def draw():
                     draw.rectangle((
                         20 + date_spacing,                   # x0
                         56 + calendar_top + date_height,     # y0
-                        44 + date_spacing,                  # x1
+                        46 + date_spacing,                  # x1
                         76  + calendar_top + date_height),  # y1
                     fill = 0)
                     font_weight = 'Bold'
@@ -171,12 +169,12 @@ def draw():
         day = datetime.datetime.now().strftime('%A')
         date = datetime.datetime.now().strftime('%-d')
 
-        draw.text((28, 8), day, font = font(32, 'Regular'), fill = 0)
-        draw.text((29, 8), date, font = font(148, 'Regular'), fill = 0)
+        draw.text((24, 8), day, font = font(32, 'Regular'), fill = 0)
+        draw.text((24, 8), date, font = font(148, 'Regular'), fill = 0)
 
     def drawEvents():
         print('drawEvents')
-        line_height = 4
+        line_height = 16
 
         # Render "Today"
         draw.text((260, 16), 'TODAY', font = font(15, 'Regular'), fill = 0)   # Day
@@ -203,12 +201,12 @@ def draw():
                 week_day = int(event_datetime.strftime('%w'))
                 week_of = 6 - week_day
 
-                draw.text((325, 48 + line_height), event_month, font = font(15, 'Regular'), fill = 0)   # Month
+                draw.text((325, 36 + line_height), event_month, font = font(15, 'Regular'), fill = 0)   # Month
                 line_height += 16
 
             # Draw date & day
-            draw.text((255, 48 + line_height), event_date, font = font(42, 'Regular'), fill = 0)   # Date
-            draw.text((260, 100 + line_height), event_day, font = font(15, 'Regular'), fill = 0)   # Day
+            draw.text((255, 36 + line_height), event_date, font = font(42, 'Regular'), fill = 0)   # Date
+            draw.text((260, 88 + line_height), event_day, font = font(15, 'Regular'), fill = 0)   # Day
 
             for event in events_format[date]:
                 # print(event['summary'])
@@ -251,12 +249,18 @@ def draw():
                     event_location = event_location[0:20] + '...' 
                 
                 # Draw summary & details
-                draw.text((325, 60 + line_height), event_summary, font = font(15, 'Bold'), fill = 0)   # Summary
-                draw.text((325, 82 + line_height), event_time + event_location, font = font(15, 'Regular'), fill = 0)  # Details
+                draw.text((325, 48 + line_height), event_summary, font = font(15, 'Bold'), fill = 0)   # Summary
+                draw.text((325, 68 + line_height), event_time + event_location, font = font(15, 'Regular'), fill = 0)  # Details
 
                 line_height += 32
 
+                # if line_height > EPD_HEIGHT:
+                #     break
+
             line_height += 48
+            
+            # if line_height > EPD_HEIGHT:
+            #         break
 
     drawCalendar()
     drawDate()
