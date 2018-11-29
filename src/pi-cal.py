@@ -25,22 +25,20 @@ import time
 
 def main():
     print('main')
-    init()
+    init_display()
     
     with open('./credentials.json') as f:
         global creds
         creds = json.load(f)
 
-    # try:
-    #     with open('./token.json') as f:
-    #         global token
-    #         token = f
-    # except:
-    #     auth()
-
-    # Auth.auth_request()
-    # Auth.auth_poll()
-    Auth().auth_refresh()
+    try:
+        with open('./token.json') as f:
+            global token
+            token = f
+            Auth().auth_refresh()
+    except:
+        Auth.auth_request()
+        Auth.auth_poll()
 
     Events().fetch_events()
     Draws().draw_calendar()
@@ -48,7 +46,8 @@ def main():
     Draws().draw_events()
     render()
 
-def init():
+def init_display():
+    print('init display')
     global EPD_WIDTH
     EPD_WIDTH = 640
     global EPD_HEIGHT
@@ -66,8 +65,6 @@ def init():
     draw = ImageDraw.Draw(image)
 
 class Auth:
-    print('auth')
-
     auth_response = None
     device_code = None
 
@@ -193,7 +190,7 @@ class Events:
         events = self.format_events(events_response)
 
     def format_events(self, events):
-        print('format_events')
+        print('format events')
         events_format = {}
 
         for event in events:
@@ -216,9 +213,7 @@ class Events:
 def getFont(size, weight):
         return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
 
-class Draws():
-    print('draw')
-    
+class Draws():    
     def draw_calendar(self):
         print('draw calendar')
 
