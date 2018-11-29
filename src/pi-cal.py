@@ -15,7 +15,7 @@ import json
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from pprint import pprint
+# from pprint import pprint
 import requests
 # import sys
 import time
@@ -29,7 +29,7 @@ with open('./data.json') as f:
 def main():
     init()
     auth()
-    # fetchEvents()
+    # fetch_events()
     # draw()
 
 def init():
@@ -55,9 +55,13 @@ def auth():
     AUTH_URL = 'https://accounts.google.com/o/oauth2/device/code'
     CLIENT_ID = '635286573706-22bvqd3vc034afg5vn9nopi6n6jed7sn.apps.googleusercontent.com'
     CLIENT_SECRET = 'Mc17FgVoPBYoxxaIPlboNBYn'
+    DEVICE_CODE = ''
     GRANT_TYPE = 'http://oauth.net/grant_type/device/1.0'
     SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'    # If modifying these scopes, delete the file token.json.
     TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
+
+    # def auth_request():
+    print('auth request')
 
     # Initial request
     auth_response = requests.post(AUTH_URL, data = {
@@ -75,6 +79,7 @@ def auth():
 
     DEVICE_CODE = auth_response['device_code']
 
+    # Render device auth codes
     group_top = 116
 
     draw.text((24, group_top), 'Visit', font = getFont(18, 'Regular'), fill = 0)
@@ -84,6 +89,10 @@ def auth():
 
     render()
 
+# def auth_poll():
+    print('auth poll')
+    
+    # Poll Google API for auth confirmation token (after user accepts on separate device)
     # interval = auth_response['interval']
     interval = 30
     time.sleep(interval)
@@ -112,19 +121,27 @@ def auth():
         token_response = request_token()
         print(token_response.json())
 
-        if (token_response.ok):
+        if token_response.ok:
             break
+        # elif token_response == 403 or token_response == 400
         else:
             time.sleep(interval)
             i += interval
 
+    # Store token
     # print(token_response.elapsed.total_seconds(), token_response.status_code, token_response.ok)
     token = token_response.json()
-    pprint(token)
+    print('success!')
+    
+    with open('token.json', 'w') as fp:
+        json.dump(token, fp)
+
+    # auth_request()
+    # auth_poll()
 
 
-def fetchEvents():
-    print('fetchEvents')
+def fetch_events():
+    print('fetch events')
     # Shows basic usage of the Google Calendar API.
     # Prints the start and name of the next 10 events on the user's calendar.
 
@@ -158,8 +175,8 @@ def fetchEvents():
     # for event in events: 
     #     start = event['start'].get('dateTime', event['start'].get('date'))
 
-def formatEvents(events):
-    print('formatEvents')
+def format_events(events):
+    print('format_events')
 
     events_format = {}
 
@@ -184,10 +201,10 @@ def getFont(size, weight):
         return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
 
 def draw():
-    print('drawEvents')
+    print('draw')
     
-    def drawCalendar():
-        print('drawCalendar')
+    def draw_calendar():
+        print('draw calendar')
 
         now = datetime.datetime.now()
         today = now.day
@@ -243,23 +260,23 @@ def draw():
             
             date_height += 22
     
-    def drawDate():
-        print('drawDate')
+    def draw_date():
+        print('draw date')
         day = datetime.datetime.now().strftime('%A')
         date = datetime.datetime.now().strftime('%-d')
 
         draw.text((24, 8), day, font = getFont(32, 'Regular'), fill = 0)
         draw.text((24, 8), date, font = getFont(148, 'Regular'), fill = 0)
 
-    def drawEvents():
-        print('drawEvents')
+    def draw_events():
+        print('draw events')
         line_height = 16
 
         # Render "Today"
         draw.text((260, 16), 'TODAY', font = getFont(15, 'Regular'), fill = 0)   # Day
         draw.text((325, 16), 'Not much going on!', font = getFont(15, 'Italic'), fill = 0)  # Details
 
-        events_format = formatEvents(events)
+        events_format = format_events(events)
 
         # Sort formatted events by date
         dates_sort = [ datetime.datetime.strptime(event_key, '%Y-%m-%d') for event_key in events_format.keys() ]
@@ -341,9 +358,9 @@ def draw():
             # if line_height > EPD_HEIGHT:
             #         break
 
-    drawCalendar()
-    drawDate()
-    drawEvents()
+    draw_calendar()
+    draw_date()
+    draw_events()
     render()
 
 def render():
