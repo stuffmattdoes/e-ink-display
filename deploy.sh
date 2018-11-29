@@ -5,6 +5,7 @@ EXCLUDE=(
     "__pycache__"
 )
 INCLUDE=(
+    "credentials.json"
     "pi-cal.py"
     "requirements.txt"
     "src"
