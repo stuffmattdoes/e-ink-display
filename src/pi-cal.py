@@ -15,7 +15,7 @@ import json
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from pprint import pprint
+# from pprint import pprint
 import requests
 # import sys
 import time
@@ -183,7 +183,7 @@ class Events:
                 'Authorization': '{} {}'.format(token['token_type'], token['access_token'])
             },
             params = {
-                'maxResults': 10,
+                'maxResults': 5,
                 'orderBy': 'startTime',
                 'singleEvents': True,
                 'timeMin': now
@@ -356,8 +356,8 @@ class Draws():
                 if len(event_summary) > 24:
                     event_summary = event_summary[0:24] + '...' 
                 
-                if len(event_location) > 20:
-                    event_location = event_location[0:20] + '...' 
+                if len(event_location) > 18:
+                    event_location = event_location[0:18] + '...' 
                 
                 # Draw summary & details
                 draw.text((325, 48 + line_height), event_summary, font = getFont(15, 'Bold'), fill = 0)   # Summary
@@ -365,13 +365,13 @@ class Draws():
 
                 line_height += 32
 
-                # if line_height > EPD_HEIGHT:
-                #     break
+                if line_height > EPD_HEIGHT:
+                    break
 
             line_height += 48
-            
-            # if line_height > EPD_HEIGHT:
-            #         break
+
+            if line_height > EPD_HEIGHT:
+                break
 
 def render():
     # Render
