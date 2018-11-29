@@ -26,28 +26,27 @@ import time
 def main():
     print('main')
     init()
-
-    # with open('./data.json') as f:
-    #     global events
-    #     events = json.load(f)
     
     with open('./credentials.json') as f:
         global creds
         creds = json.load(f)
 
-    try:
-        with open('./token.json') as f:
-            global token
-            token = f
+    # try:
+    #     with open('./token.json') as f:
+    #         global token
+    #         token = f
+    # except:
+    #     auth()
 
-    except:
-        auth()
-    
-    # fetch_events()
-    draw()
+    # Auth.auth_request()
+    # Auth.auth_poll()
+    Auth().auth_refresh()
 
-    # pprint(creds)
-    pprint(token)
+    Events().fetch_events()
+    Draws().draw_calendar()
+    Draws().draw_date()
+    Draws().draw_events()
+    render()
 
 def init():
     global EPD_WIDTH
@@ -66,19 +65,20 @@ def init():
     global draw
     draw = ImageDraw.Draw(image)
 
-def auth():
+class Auth:
     print('auth')
 
     auth_response = None
     device_code = None
 
-    def auth_request():
+    def auth_request(self):
         print('auth request')
+        global creds
 
         # Initial request
-        auth_response = requests.post(creds.auth_url, data = {
-            'client_id': creds.client_id,
-            'scope': creds.scopes
+        auth_response = requests.post(creds['auth_url'], data = {
+            'client_id': creds['client_id'],
+            'scope': creds['scopes']
         }).json()
 
         # {
@@ -101,8 +101,9 @@ def auth():
 
         render()
 
-    def auth_poll():
+    def auth_poll(self):
         print('auth poll')
+        global creds
         
         # Poll Google API for auth confirmation token (after user accepts on separate device)
         # interval = auth_response['interval']
@@ -111,11 +112,11 @@ def auth():
 
         def request_token():
             # Token polling
-            return requests.post(creds.token_url, data = {
-                'client_id': creds.client_id,
-                'client_secret': creds.client_secret,
-                'code': creds.device_code,
-                'grant_type': creds.grant_type
+            return requests.post(creds['token_url'], data = {
+                'client_id': creds['client_id'],
+                'client_secret': creds['client_secret'],
+                'code': creds['device_code'],
+                'grant_type': creds['grant_type']
             })
 
         token_response = request_token()
@@ -131,7 +132,6 @@ def auth():
 
         while i < auth_response['expires_in'] and not token_response.ok:
             token_response = request_token()
-            print(token_response.json())
 
             if token_response.ok:
                 break
@@ -146,76 +146,80 @@ def auth():
         with open('token.json', 'w') as fp:
             json.dump(token_response.json(), fp)
 
-    def auth_refresh():
+    def auth_refresh(self):
         print('auth refresh')
 
-    auth_request()
-    auth_poll()
+        refresh_token = requests.post(creds['refresh_url'], data = {
+            'client_id': creds['client_id'],
+            'client_secret': creds['client_secret'],
+            'grant_type': 'refresh_token',
+            'refresh_token': creds['refresh_token']
+        }).json()
 
-def fetch_events():
-    print('fetch events')
-    # Shows basic usage of the Google Calendar API.
-    # Prints the start and name of the next 10 events on the user's calendar.
+        # {
+        #     "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
+        #     "expires_in":3920,
+        #     "token_type":"Bearer"
+        # }
 
-    # store = file.Storage('token.json')
-    # creds = store.get()
+        global token
+        token = refresh_token
 
-    # if not creds or creds.invalid:
-    #     flow = client.flow_from_clientsecrets('e-ink_home_display-dcb881b9fb01.json', scopes)
-    #     creds = tools.run_flow(flow, store)
-    # service = build('calendar', 'v3', http=creds.authorize(Http()))
+        with open('token.json', 'w') as fp:
+            json.dump(refresh_token, fp)
 
-    # # Call the Calendar API
-    # now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    
-    # print('Getting the upcoming 10 events')
-    
-    # events_result = service.events().list(
-    #     calendarId='lkopeh0sr1m9svqcggd0pms2ug@group.calendar.google.com',
-    #     maxResults=10,
-    #     orderBy='startTime',
-    #     singleEvents=True,
-    #     timeMin=now
-    # ).execute()
-    
-    # global events
-    # events = events_result.get('items', [])
+class Events:
+    def fetch_events(self):
+        print('fetch events')
+        global creds
+        global events
+        global token
 
-    # if not events:
-    #     print('No upcoming events found.')
-    
-    # for event in events: 
-    #     start = event['start'].get('dateTime', event['start'].get('date'))
+        events_url = 'https://www.googleapis.com/calendar/v3/calendars/{}/events'.format(creds['calendar_id'])
+        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
-def format_events(events):
-    print('format_events')
+        events_response = requests.get(events_url, 
+            headers = {
+                'Authorization': '{} {}'.format(token['token_type'], token['access_token'])
+            },
+            params = {
+                'maxResults': 10,
+                'orderBy': 'startTime',
+                'singleEvents': True,
+                'timeMin': now
+            }
+        ).json()['items']
 
-    events_format = {}
+        events = self.format_events(events_response)
 
-    for event in events:
-        event_YMD = ''
+    def format_events(self, events):
+        print('format_events')
+        events_format = {}
 
-        # Get our date, formatted as YYYY-MM-DD
-        try:
-            event_YMD = datetime.datetime.strptime(event['start']['dateTime'][0:10], '%Y-%m-%d').strftime('%Y-%m-%d')
-        except:
-            event_YMD = datetime.datetime.strptime(event['start']['date'][0:10], '%Y-%m-%d').strftime('%Y-%m-%d')
+        for event in events:
+            event_YMD = ''
 
-        # Format a new dictionary with the date as key & events list as value
-        try:
-            events_format[event_YMD].append(event)
-        except:
-            events_format[event_YMD] = [event]
+            # Get our date, formatted as YYYY-MM-DD
+            try:
+                event_YMD = datetime.datetime.strptime(event['start']['dateTime'][0:10], '%Y-%m-%d').strftime('%Y-%m-%d')
+            except:
+                event_YMD = datetime.datetime.strptime(event['start']['date'][0:10], '%Y-%m-%d').strftime('%Y-%m-%d')
 
-    return events_format
+            # Format a new dictionary with the date as key & events list as value
+            try:
+                events_format[event_YMD].append(event)
+            except:
+                events_format[event_YMD] = [event]
+
+        return events_format
 
 def getFont(size, weight):
         return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
 
-def draw():
+class Draws():
     print('draw')
     
-    def draw_calendar():
+    def draw_calendar(self):
         print('draw calendar')
 
         now = datetime.datetime.now()
@@ -272,7 +276,7 @@ def draw():
             
             date_height += 22
     
-    def draw_date():
+    def draw_date(self):
         print('draw date')
         day = datetime.datetime.now().strftime('%A')
         date = datetime.datetime.now().strftime('%-d')
@@ -280,18 +284,17 @@ def draw():
         draw.text((24, 8), day, font = getFont(32, 'Regular'), fill = 0)
         draw.text((24, 8), date, font = getFont(148, 'Regular'), fill = 0)
 
-    def draw_events():
+    def draw_events(self):
         print('draw events')
+        global events
         line_height = 16
 
         # Render "Today"
         draw.text((260, 16), 'TODAY', font = getFont(15, 'Regular'), fill = 0)   # Day
         draw.text((325, 16), 'Not much going on!', font = getFont(15, 'Italic'), fill = 0)  # Details
 
-        events_format = format_events(events)
-
         # Sort formatted events by date
-        dates_sort = [ datetime.datetime.strptime(event_key, '%Y-%m-%d') for event_key in events_format.keys() ]
+        dates_sort = [ datetime.datetime.strptime(event_key, '%Y-%m-%d') for event_key in events.keys() ]
         dates_sort.sort()
         dates_sort = [ datetime.datetime.strftime(date_key, '%Y-%m-%d') for date_key in dates_sort ]
 
@@ -316,7 +319,7 @@ def draw():
             draw.text((255, 36 + line_height), event_date, font = getFont(42, 'Regular'), fill = 0)   # Date
             draw.text((260, 88 + line_height), event_day, font = getFont(15, 'Regular'), fill = 0)   # Day
 
-            for event in events_format[date]:
+            for event in events[date]:
                 # print(event['summary'])
                 event_summary = event['summary']
 
@@ -369,11 +372,6 @@ def draw():
             
             # if line_height > EPD_HEIGHT:
             #         break
-
-    draw_calendar()
-    draw_date()
-    draw_events()
-    render()
 
 def render():
     # Render
