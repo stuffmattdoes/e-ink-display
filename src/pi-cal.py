@@ -1,4 +1,4 @@
-# main
+#! /home/pi/python_programs/pi-cal/src/pi-cal.py
 
 import calendar
 import epd7in5
@@ -395,6 +395,8 @@ class Draws():
 
 def render():
     # Render
+
+    draw.text((460, 16), 'Updated: {}'.format(datetime.datetime.now().strftime('%Y/%m/%d %H:%M'), font = getFont(12, 'Regular')))
     epd.display_frame(epd.get_frame_buffer(image))
 
 if __name__ == '__main__':

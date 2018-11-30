@@ -48,7 +48,6 @@
 (WaveShare E-Ink 7.5" Display Drivers)[https://www.waveshare.com/wiki/Pioneer600#Libraries_Installation_for_RPi]
 (Google Calendar API Authentication)[https://developers.google.com/identity/protocols/OAuth2ForDevices#allowedscopes]
 (Google Calendar API)[https://developers.google.com/calendar/v3/reference/events/list?apix_params=%7B%22calendarId%22%3A%22lkopeh0sr1m9svqcggd0pms2ug%40group.calendar.google.com%22%2C%22orderBy%22%3A%22startTime%22%7D]
-(Cron job for Raspberry Pi)[https://www.dexterindustries.com/howto/auto-run-python-programs-on-the-raspberry-pi/]
 
 # TODO:
 [ ] event['start']['dateTime'] & event['end']['dateTime'] may span a few days
@@ -56,3 +55,9 @@
 [ ] On multi-day event, if date is end day, display "Ends @ 10:30PM"
 [x] Show "Today" & populate accordingly
 [ ] Show "X more events this week"
+
+# Cronjob
+`crontab -e`
+and enter
+`0 8-23 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
+to run a cronjob every hour from 8AM to midnight
