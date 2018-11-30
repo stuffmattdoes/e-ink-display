@@ -290,7 +290,7 @@ class Draws():
         print('draw events')
         global events
         line_height = 16
-        month_count = datetime.datetime.now().strftime('%B')
+        month_count = datetime.datetime.now().strftime('%B').upper()
 
         # Sort formatted events by date (closest -> furthest)
         dates_sort = [ datetime.datetime.strptime(event_key, '%Y-%m-%d') for event_key in events.keys() ]
@@ -340,8 +340,8 @@ class Draws():
                     # print('try')
                     event_datetime_start = datetime.datetime.strptime(event['start']['dateTime'][0:19], '%Y-%m-%dT%H:%M:%S')
                     event_datetime_end = datetime.datetime.strptime(event['end']['dateTime'][0:19], '%Y-%m-%dT%H:%M:%S')
-                    event_time_start = event_datetime_start.strftime('%-I') + ':' + event_datetime_start.strftime('%M') + event_datetime_start.strftime('%p')       # "7:30AM'
-                    event_time_end = event_datetime_end.strftime('%-I') + ':' + event_datetime_end.strftime('%M') + event_datetime_end.strftime('%p')     # "10:30PM"
+                    event_time_start = event_datetime_start.strftime('%-I%p') if event_datetime_start.minute == 0 else event_datetime_start.strftime('%-I:%M%p')
+                    event_time_end = event_datetime_end.strftime('%-I%p') if event_datetime_end.minute == 0 else event_datetime_end.strftime('%-I:%M%p')
 
                     # For multi-day events
                     if event['start']['dateTime'][0:10] == event['end']['dateTime'][0:10]:
