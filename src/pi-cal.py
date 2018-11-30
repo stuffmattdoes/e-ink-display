@@ -24,6 +24,7 @@ def main():
         global creds
         creds = json.load(f)
 
+    # If we've authenticated before
     try:
         with open('./token.json') as f:
             global token
@@ -71,7 +72,7 @@ class Auth:
             'scope': creds['scopes']
         }).json()
 
-        # {
+        # response = {
         #   'device_code': 'AH-1Ng1BzvzcVPXWrakudSRlaBkKTm5otqDWNT0u0p5J9mjXR1hMiS-rUS5D7Ss7LvDvAumcQReo_ME9N30vcEWiLbMQq0ORCw',
         #   'expires_in': 1800,
         #   'interval': 5,
@@ -111,7 +112,7 @@ class Auth:
 
         token_response = request_token()
 
-        # {
+        # response = {
         #     "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
         #     "expires_in":3920,
         #     "token_type":"Bearer",
@@ -131,7 +132,7 @@ class Auth:
                 i += interval
 
         # Store token
-        print('success!')
+        print('Auth successful!')
         
         with open('token.json', 'w') as fp:
             json.dump(token_response.json(), fp)
@@ -146,7 +147,7 @@ class Auth:
             'refresh_token': creds['refresh_token']
         }).json()
 
-        # {
+        # response = {
         #     "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
         #     "expires_in":3920,
         #     "token_type":"Bearer"
@@ -157,6 +158,8 @@ class Auth:
 
         with open('token.json', 'w') as fp:
             json.dump(refresh_token, fp)
+
+        print('Refresh successful!')
 
 class Events:
     def fetch_events(self):
@@ -224,7 +227,7 @@ class Draws():
         calendar_title_text = '{} {}'.format(month_str, year)
         calendar_title_w = calendar_title_font.getsize(calendar_title_text)[0]
         calendar_title_x = (190 / 2) - (calendar_title_w / 2)
-        draw.text((24 + calendar_title_x, calendar_top), calendar_title_text, align = 'center', font = calendar_title_font, fill = 0)
+        draw.text((24 + calendar_title_x, calendar_top), calendar_title_text, font = calendar_title_font, fill = 0)
         
         # Weekdays
         draw.text((24, 30 + calendar_top), 'Su', font = getFont(18, 'Bold'), fill = 0)
