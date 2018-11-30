@@ -1,12 +1,5 @@
 # main
 
-# TODO:
-# - event['start']['dateTime'] & event['end']['dateTime'] may span a few days
-# - On multi-day event, if date is start day, display "Starts @ 7:30AM"
-# - On multi-day event, if date is end day, display "Ends @ 10:30PM"
-# - Show "Today" & populate accordingly
-# - Show "X more events this week"
-
 import calendar
 import epd7in5
 import datetime
@@ -223,39 +216,45 @@ class Draws():
         month = now.month
         month_str = now.strftime('%B')
         calendar_top = 200
-
-
-        # calendar.setfirstweekday(calendar.SUNDAY)
         cal = calendar.Calendar(calendar.SUNDAY)
         days_in_weeks = cal.monthdayscalendar(year, month)
 
-        # Title
-        draw.text((24, calendar_top), '{} {}'.format(month_str, year), font = getFont(20, 'Regular'), fill = 0)
+        # Calendar title. Gotta do some trickery to center-align text
+        calendar_title_font = getFont(20, 'Regular')
+        calendar_title_text = '{} {}'.format(month_str, year)
+        calendar_title_w = calendar_title_font.getsize(calendar_title_text)[0]
+        calendar_title_x = (190 / 2) - (calendar_title_w / 2)
+        draw.text((24 + calendar_title_x, calendar_top), calendar_title_text, align = 'center', font = calendar_title_font, fill = 0)
         
         # Weekdays
         draw.text((24, 30 + calendar_top), 'Su', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((56, 30 + calendar_top), 'M', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((82, 30 + calendar_top), 'T', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((55, 30 + calendar_top), 'M', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((84, 30 + calendar_top), 'T', font = getFont(18, 'Bold'), fill = 0)
         draw.text((112, 30 + calendar_top), 'W', font = getFont(18, 'Bold'), fill = 0)
         draw.text((138, 30 + calendar_top), 'Th', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((168, 30 + calendar_top), 'F', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((194, 30 + calendar_top), 'S', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((170, 30 + calendar_top), 'F', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((198, 30 + calendar_top), 'S', font = getFont(18, 'Bold'), fill = 0)
 
-        date_height = 0
+        date_line_height = 0
 
         # Weeks
         for week in days_in_weeks:
             date_spacing = 0
 
             for day in week:
-                day_text = day
 
+                if len(str(day)) == 1:
+                    day_text = '  ' + str(day)
+                else:
+                    day_text = str(day)
+
+                # Draw a cute lil box around today's date
                 if day == today:
                     draw.rectangle((
                         20 + date_spacing,                   # x0
-                        56 + calendar_top + date_height,     # y0
+                        56 + calendar_top + date_line_height,     # y0
                         46 + date_spacing,                  # x1
-                        76  + calendar_top + date_height),  # y1
+                        76  + calendar_top + date_line_height),  # y1
                     fill = 0)
                     font_weight = 'Bold'
                     font_fill = 255
@@ -264,55 +263,67 @@ class Draws():
                     font_fill = 0
 
                 if day == 0:
-                    day_text = '-'
-                
-                draw.text((24 + date_spacing, 56 + calendar_top + date_height), str(day_text), font = getFont(15, font_weight), fill = font_fill)
+                    day_text = '  -'
+
+                draw.text((24 + date_spacing, 56 + calendar_top + date_line_height), day_text, font = getFont(15, font_weight), fill = font_fill)
                 date_spacing += 28
             
-            date_height += 22
+            date_line_height += 22
     
     def draw_date(self):
         print('draw date')
-        day = datetime.datetime.now().strftime('%A')
-        date = datetime.datetime.now().strftime('%-d')
 
-        draw.text((24, 8), day, font = getFont(32, 'Regular'), fill = 0)
-        draw.text((24, 8), date, font = getFont(148, 'Regular'), fill = 0)
+        # Center-alignment trickery
+        date_font = getFont(148, 'Regular')
+        date_text = datetime.datetime.now().strftime('%-d')
+        date_text_w = date_font.getsize(date_text)[0]
+        date_text_x = (190 / 2) - (date_text_w / 2)
+        day_font = getFont(32, 'Regular')
+        day_text = datetime.datetime.now().strftime('%A')
+        day_text_w = day_font.getsize(day_text)[0]
+        day_text_x = (190 / 2) - (day_text_w / 2)
+
+        draw.text((24 + day_text_x, 12), day_text, font = day_font, fill = 0)
+        draw.text((24 + date_text_x, 12), date_text, font = date_font, fill = 0)
 
     def draw_events(self):
         print('draw events')
         global events
         line_height = 16
+        month_count = datetime.datetime.now().strftime('%B')
 
-        # Render "Today"
-        draw.text((260, 16), 'TODAY', font = getFont(15, 'Regular'), fill = 0)   # Day
-        draw.text((325, 16), 'Not much going on!', font = getFont(15, 'Italic'), fill = 0)  # Details
-
-        # Sort formatted events by date
+        # Sort formatted events by date (closest -> furthest)
         dates_sort = [ datetime.datetime.strptime(event_key, '%Y-%m-%d') for event_key in events.keys() ]
         dates_sort.sort()
         dates_sort = [ datetime.datetime.strftime(date_key, '%Y-%m-%d') for date_key in dates_sort ]
 
         for date in dates_sort:
             # Event Group Date
-            event_datetime = datetime.datetime.strptime(date, '%Y-%m-%d')
-            event_date = event_datetime.strftime('%d')
-            event_day = event_datetime.strftime('%a').upper()
+            event_datetime = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+            event_month = event_datetime.strftime('%B').upper()
 
-            # If event isn't this week or month
-            event_week = event_datetime.strftime('%U')
-            event_month = event_datetime.strftime('%b').upper()
+            # If event is today
+            if event_datetime == datetime.datetime.today().date():
+                draw.text((260, line_height), 'TODAY', font = getFont(15, 'Regular'), fill = 0)   # Day
 
-            if event_week != datetime.datetime.now().strftime('%U'):
-                week_day = int(event_datetime.strftime('%w'))
-                week_of = 6 - week_day
+            else:
+                # If event isn't this month
+                if event_month != month_count:
+                    month_count = event_month
 
-                draw.text((325, 36 + line_height), event_month, font = getFont(15, 'Regular'), fill = 0)   # Month
-                line_height += 16
+                    draw.text((325, line_height), event_month, font = getFont(15, 'Regular'), fill = 0)   # Month
+                    line_height += 32
+                    
+                # Draw date & day
+                event_date_font = getFont(42, 'Regular')
+                event_date_text = event_datetime.strftime('%d')
+                event_day_font = getFont(15, 'Regular')
+                event_day_text = event_datetime.strftime('%a').upper()
+                event_day_text_w = event_day_font.getsize(event_day_text)[0]
+                event_day_text_x = 42 - event_day_text_w
 
-            # Draw date & day
-            draw.text((255, 36 + line_height), event_date, font = getFont(42, 'Regular'), fill = 0)   # Date
-            draw.text((260, 88 + line_height), event_day, font = getFont(15, 'Regular'), fill = 0)   # Day
+                draw.text((255, line_height - 10), event_date_text, font = event_date_font, fill = 0)   # Date
+                draw.text((255 + event_day_text_x, 40 + line_height), event_day_text, font = event_day_font, fill = 0)   # Day
 
             for event in events[date]:
                 # print(event['summary'])
@@ -337,7 +348,7 @@ class Draws():
                         # print('Same day')
                         event_time = '{} - {} '.format(event_time_start, event_time_end)     # "7:30AM - 10:45PM"
 
-                    else :
+                    else:
                         # print('Different days')
                         event_time = ''
 
@@ -348,24 +359,35 @@ class Draws():
                     event_time = ''
 
                 # Truncate long descriptions
-                if len(event_summary) > 24:
-                    event_summary = event_summary[0:24] + '...' 
+                if len(event_summary) > 26:
+                    event_summary = event_summary[0:26] + '...' 
                 
-                if len(event_location) > 18:
-                    event_location = event_location[0:18] + '...' 
+                if len(event_location) > 26:
+                    event_location = event_location[0:26] + '...' 
                 
                 # Draw summary & details
-                draw.text((325, 48 + line_height), event_summary, font = getFont(15, 'Bold'), fill = 0)   # Summary
-                draw.text((325, 68 + line_height), event_time + event_location, font = getFont(15, 'Regular'), fill = 0)  # Details
+                draw.text((325, line_height), event_summary, font = getFont(15, 'Bold'), fill = 0)   # Summary
+                line_height += 14
 
-                line_height += 32
+                if (event_time):
+                    line_height += 10
+                    draw.text((325, line_height), event_time, font = getFont(15, 'Regular'), fill = 0)  # Time
+                    line_height += 10
+                if (line_height):
+                    line_height += 10
+                    draw.text((325, line_height), event_location, font = getFont(15, 'Regular'), fill = 0)  # Location
+                    line_height += 10
+
+                # line_height += 12
 
                 if line_height > EPD_HEIGHT:
+                    print('break 1')
                     break
 
-            line_height += 48
+            line_height += 32
 
             if line_height > EPD_HEIGHT:
+                print('break 2')
                 break
 
 def render():
