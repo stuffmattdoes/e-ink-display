@@ -59,5 +59,5 @@
 # Cronjob
 `crontab -e`
 and enter
-`0 8-23 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
+`0 8-0 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
 to run a cronjob every hour from 8AM to midnight
