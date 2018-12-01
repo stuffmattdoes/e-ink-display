@@ -156,8 +156,8 @@ class EPD:
         self.delay_ms(200)    
 
     def get_frame_buffer(self, image):
-        # buf = [0x00] * (self.width * self.height / 8)
-        buf = [0x00] * int((self.width * self.height / 8))
+        buf = [0x00] * (self.width * self.height / 8)
+        # buf = [0x00] * int((self.width * self.height / 8))  # To work with python3
 
         # Set buffer to value of Python Imaging Library image.
         # Image must be in mode 1.
