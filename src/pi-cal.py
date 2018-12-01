@@ -335,7 +335,7 @@ class Draws():
 
                 # Event Location
                 try:
-                    event_location = '@ ' + event['location']
+                    event_location = '@ ' + event['location'].replace('\n', ', ')
                 except:
                     event_location = ''
 
@@ -380,9 +380,9 @@ class Draws():
                 if (event_location):
                     line_height += 10
                     draw.text((325, line_height), event_location, font = getFont(15, 'Regular'), fill = 0)  # Location
-                    line_height += 10
+                    # line_height += 10
 
-                # line_height += 12
+                line_height += 12
 
                 if line_height > EPD_HEIGHT:
                     print('break 1')
