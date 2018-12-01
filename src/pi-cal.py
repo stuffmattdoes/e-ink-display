@@ -159,7 +159,7 @@ class Auth:
         with open('token.json', 'w') as fp:
             json.dump(refresh_token, fp)
 
-        print('Refresh successful!')
+        print('refresh successful!')
 
 class Events:
     def fetch_events(self):
@@ -219,7 +219,7 @@ class Draws():
         year = now.year
         month = now.month
         month_str = now.strftime('%B')
-        calendar_top = 200
+        calendar_top = 192
         cal = calendar.Calendar(calendar.SUNDAY)
         days_in_weeks = cal.monthdayscalendar(year, month)
 
@@ -231,13 +231,13 @@ class Draws():
         draw.text((24 + calendar_title_x, calendar_top), calendar_title_text, font = calendar_title_font, fill = 0)
         
         # Weekdays
-        draw.text((24, 30 + calendar_top), 'Su', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((55, 30 + calendar_top), 'M', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((84, 30 + calendar_top), 'T', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((112, 30 + calendar_top), 'W', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((138, 30 + calendar_top), 'Th', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((170, 30 + calendar_top), 'F', font = getFont(18, 'Bold'), fill = 0)
-        draw.text((198, 30 + calendar_top), 'S', font = getFont(18, 'Bold'), fill = 0)
+        draw.text((24, 30 + calendar_top), 'Su', font = getFont(15, 'Bold'), fill = 0)
+        draw.text((55, 30 + calendar_top), 'M', font = getFont(15, 'Bold'), fill = 0)
+        draw.text((84, 30 + calendar_top), 'T', font = getFont(15, 'Bold'), fill = 0)
+        draw.text((112, 30 + calendar_top), 'W', font = getFont(15, 'Bold'), fill = 0)
+        draw.text((138, 30 + calendar_top), 'Th', font = getFont(15, 'Bold'), fill = 0)
+        draw.text((170, 30 + calendar_top), 'F', font = getFont(15, 'Bold'), fill = 0)
+        draw.text((198, 30 + calendar_top), 'S', font = getFont(15, 'Bold'), fill = 0)
 
         date_line_height = 0
 
@@ -288,7 +288,7 @@ class Draws():
         day_text_x = (190 / 2) - (day_text_w / 2)
 
         draw.text((24 + day_text_x, 12), day_text, font = day_font, fill = 0)
-        draw.text((24 + date_text_x, 12), date_text, font = date_font, fill = 0)
+        draw.text((24 + date_text_x, 16), date_text, font = date_font, fill = 0)
 
     def draw_events(self):
         print('draw events')
@@ -330,7 +330,6 @@ class Draws():
                 draw.text((255 + event_day_text_x, 40 + line_height), event_day_text, font = event_day_font, fill = 0)   # Day
 
             for event in events[date]:
-                # print(event['summary'])
                 event_summary = event['summary']
 
                 # Event Location
@@ -341,7 +340,6 @@ class Draws():
 
                 # Time
                 try:
-                    # print('try')
                     event_datetime_start = datetime.datetime.strptime(event['start']['dateTime'][0:19], '%Y-%m-%dT%H:%M:%S')
                     event_datetime_end = datetime.datetime.strptime(event['end']['dateTime'][0:19], '%Y-%m-%dT%H:%M:%S')
                     event_time_start = event_datetime_start.strftime('%-I%p') if event_datetime_start.minute == 0 else event_datetime_start.strftime('%-I:%M%p')
@@ -349,15 +347,12 @@ class Draws():
 
                     # For multi-day events
                     if event['start']['dateTime'][0:10] == event['end']['dateTime'][0:10]:
-                        # print('Same day')
                         event_time = '{} - {} '.format(event_time_start, event_time_end)     # "7:30AM - 10:45PM"
 
                     else:
-                        # print('Different days')
                         event_time = ''
 
                 except:
-                    # print('except')
                     event_datetime_start = datetime.datetime.strptime(event['start']['date'], '%Y-%m-%d')
                     event_datetime_end = datetime.datetime.strptime(event['end']['date'], '%Y-%m-%d')
                     event_time = ''
@@ -385,13 +380,11 @@ class Draws():
                 line_height += 12
 
                 if line_height > EPD_HEIGHT:
-                    print('break 1')
                     break
 
             line_height += 32
 
             if line_height > EPD_HEIGHT:
-                print('break 2')
                 break
 
 def render():
