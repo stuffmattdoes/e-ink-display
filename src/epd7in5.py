@@ -25,7 +25,7 @@
  #
 
 import epdif
-from PIL import Image
+import Image
 import RPi.GPIO as GPIO
 
 # Display resolution
@@ -156,9 +156,8 @@ class EPD:
         self.delay_ms(200)    
 
     def get_frame_buffer(self, image):
-        # buf = [0x00] * (self.width * self.height / 8)
-        buf = [0x00] * int((self.width * self.height / 8))  # To work with python3
-
+        buf = [0x00] * (self.width * self.height / 8)
+        # buf = [0x00] * int((self.width * self.height / 8))  # To work with python3
         # Set buffer to value of Python Imaging Library image.
         # Image must be in mode 1.
         image_monocolor = image.convert('1')
@@ -172,7 +171,8 @@ class EPD:
             for x in range(self.width):
                 # Set the bits for the column of pixels at the current position.
                 if pixels[x, y] != 0:
-                    buf[int((x + y * self.width) / 8)] |= 0x80 >> (x % 8)
+                    buf[(x + y * self.width) / 8] |= 0x80 >> (x % 8)
+                    # buf[int((x + y * self.width) / 8)] |= 0x80 >> (x % 8)
         return buf
 
     def display_frame(self, frame_buffer):
