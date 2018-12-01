@@ -377,7 +377,7 @@ class Draws():
                     line_height += 10
                     draw.text((325, line_height), event_time, font = getFont(15, 'Regular'), fill = 0)  # Time
                     line_height += 10
-                if (line_height):
+                if (event_location):
                     line_height += 10
                     draw.text((325, line_height), event_location, font = getFont(15, 'Regular'), fill = 0)  # Location
                     line_height += 10
