@@ -176,7 +176,7 @@ class Events:
                 'Authorization': '{} {}'.format(token['token_type'], token['access_token'])
             },
             params = {
-                'maxResults': 5,
+                'maxResults': 8,
                 'orderBy': 'startTime',
                 'singleEvents': True,
                 'timeMin': now
@@ -207,7 +207,8 @@ class Events:
         return events_format
 
 def getFont(size, weight):
-        return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
+    # return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/PlayfairDisplay-{}.ttf'.format(weight), size)
+    return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
 
 class Draws():    
     def draw_calendar(self):
@@ -396,8 +397,8 @@ class Draws():
 def render():
     # Render
 
-    draw.text((565, 16), 'Updated', font = getFont(12, 'Regular'))
-    draw.text((515, 32), datetime.datetime.now().strftime('%Y/%m/%d %H:%M'), font = getFont(12, 'Regular'))
+    draw.text((570, 16), 'Updated', font = getFont(12, 'Regular'))
+    draw.text((520, 32), datetime.datetime.now().strftime('%Y/%m/%d %H:%M'), font = getFont(12, 'Regular'))
 
     epd.display_frame(epd.get_frame_buffer(image))
 
