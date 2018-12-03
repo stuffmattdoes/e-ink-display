@@ -35,6 +35,7 @@ def main():
         Auth.auth_poll()
 
     Events().fetch_events()
+    Events().fetch_weather()
     Draws().draw_calendar()
     Draws().draw_date()
     Draws().draw_events()
@@ -184,6 +185,16 @@ class Events:
         ).json()['items']
 
         events = self.format_events(events_response)
+    
+    def fetch_weather():
+        print('fetch weather')
+        payload = {
+            'APPID': 'c12a8b60afb362193fd301b835f901dd',
+            # 'id': 4781756,     # City ID for City of Richmond
+            'zip': 23223
+        }
+
+        weather_response = requests.get('http://api.openweathermap.org/data/2.5/weather', params = payload)
 
     def format_events(self, events):
         print('format events')
