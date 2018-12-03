@@ -186,15 +186,19 @@ class Events:
 
         events = self.format_events(events_response)
     
-    def fetch_weather():
+    def fetch_weather(self):
         print('fetch weather')
         payload = {
             'APPID': 'c12a8b60afb362193fd301b835f901dd',
             # 'id': 4781756,     # City ID for City of Richmond
+            'units': 'imperial',
             'zip': 23223
         }
 
-        weather_response = requests.get('http://api.openweathermap.org/data/2.5/weather', params = payload)
+        weather_response = requests.get('http://api.openweathermap.org/data/2.5/weather', params = payload).json()
+        temperature = weather_response['main']['temp']
+        weather = weather_response['weather'][0]['id']
+        # print(temperature, weather)
 
     def format_events(self, events):
         print('format events')
