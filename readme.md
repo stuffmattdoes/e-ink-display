@@ -1,12 +1,20 @@
 # E-Ink Calendar Display
+I've built an E-Ink Calendar Display to show my upcoming Google Calendar events in a nice picture frame, hung on the wall.
+
+![Chicken cat helping me with the Raspberry Pi E-Ink Calendar Display](./img/chicken_calendar.jpg)
+
+I had a [Raspberry Pi 3b](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) lying around that I wanted to do something with. Once I caught wind of the [Waveshare E-Ink Display](https://www.waveshare.com/7.5inch-e-paper-hat.htm), I thought this would be a great application for it.
+
+If you're unfamiliar with what an E-Ink display is, it is the same screen technology used in Amazon's Kindle devices. Its refresh rate is very slow, which does not make it ideal for showing quick imagery or videos; however, it doesn't need any current to maintain an image on its display. Think of it as a high-tech Etch-a-Sketch.
 
 # Setup
 ## Linux Dependencies
-`sudo apt-get update`
-`sudo apt-get install`
+`sudo apt-get update` to update package list
+`sudo apt-get install` the following libraries:
 
 **Pillow dependencies**
-`sudo apt-get install libjpeg-dev zlib1g-dev`
+* `libjpeg-dev`
+* `zlib1g-dev`
 <!-- - jpeg-dev
 - zlib-dev
 - freetype-dev
@@ -48,6 +56,14 @@
 * [WaveShare E-Ink 7.5" Display Drivers](https://www.waveshare.com/wiki/Pioneer600#Libraries_Installation_for_RPi)
 * [Google Calendar API Authentication](https://developers.google.com/identity/protocols/OAuth2ForDevices#allowedscopes)
 * [Google Calendar API](https://developers.google.com/calendar/v3/reference/events/list?apix_params=%7B%22calendarId%22%3A%22lkopeh0sr1m9svqcggd0pms2ug%40group.calendar.google.com%22%2C%22orderBy%22%3A%22startTime%22%7D)
+* [openweathermap.org API](https://openweathermap.org/current#list)
+* [openweathermap.org Weather Conditions](https://openweathermap.org/weather-conditions)
+
+# Cronjob
+`crontab -e`
+and enter
+`0 8-0 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
+to run a cronjob every hour from 8AM to midnight
 
 # TODO:
 * [ ] event['start']['dateTime'] & event['end']['dateTime'] may span a few days
@@ -55,9 +71,3 @@
 * [ ] On multi-day event, if date is end day, display "Ends @ 10:30PM"
 * [x] Show "Today" & populate accordingly
 * [ ] Show "X more events this week"
-
-# Cronjob
-`crontab -e`
-and enter
-`0 8-0 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
-to run a cronjob every hour from 8AM to midnight
