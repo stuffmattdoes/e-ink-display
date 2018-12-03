@@ -38,18 +38,19 @@ If you're unfamiliar with what an E-Ink display is, it is the same screen techno
 
 <!-- - python-dev -->
 **E-Ink Display dependencies**
-- python-smbus
-- python-serial
-- python-imaging
-- python-rpi.gpio
-- wiringpi
-- python-spidev
-- fonts-freefont-ttf
+- `python-smbus`
+- `python-serial`
+- `python-imaging`
+- `python-rpi.gpio`
+- `wiringpi`
+- `python-spidev`
+- `fonts-freefont-ttf`
 
 **Python Dependencies**
-- google-api-python-client
-- oauth2client
-- pillow
+- `Pillow`
+- `RPi.GPIO`
+- `requests`
+- `spidev`
 
 # Resources
 * [WaveShare E-Ink 7.5" Display Wiki](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
