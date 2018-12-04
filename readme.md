@@ -1,7 +1,7 @@
 # E-Ink Calendar Display
 I've built an E-Ink Calendar Display to show my upcoming Google Calendar events in a nice picture frame, hung on the wall.
 
-![Chicken cat helping me with the Raspberry Pi E-Ink Calendar Display](./img/chicken_calendar.jpg)
+![Chicken cat helping me with the Raspberry Pi E-Ink Calendar Display](./docs/chicken_calendar.jpg)
 
 I had a [Raspberry Pi 3b](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) lying around that I wanted to do something with. Once I caught wind of the [Waveshare E-Ink Display](https://www.waveshare.com/7.5inch-e-paper-hat.htm), I thought this would be a great application for it.
 

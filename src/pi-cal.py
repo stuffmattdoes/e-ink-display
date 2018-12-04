@@ -16,6 +16,15 @@ import time
 # print(os.getcwd())  # current working directory, absolute path
 # print(sys.argv[0])  # working directory
 
+global draw
+global epd
+global image
+global EPD_HEIGHT
+global EPD_WIDTH
+global creds
+global token
+global weather
+
 def main():
     print('main')
     init_display()
@@ -34,11 +43,14 @@ def main():
         Auth.auth_request()
         Auth.auth_poll()
 
-    Events().fetch_events()
-    Events().fetch_weather()
-    Draws().draw_calendar()
-    Draws().draw_date()
-    Draws().draw_events()
+    draws = Draws()
+    events = Events()
+    events.fetch_events()
+    events.fetch_weather()
+    draws.draw_calendar()
+    draws.draw_date()
+    draws.draw_events()
+    draws.draw_weather()
     render()
 
 def init_display():
@@ -196,8 +208,12 @@ class Events:
         }
 
         weather_response = requests.get('http://api.openweathermap.org/data/2.5/weather', params = payload).json()
-        temperature = weather_response['main']['temp']
-        weather = weather_response['weather'][0]['id']
+        
+        global weather 
+        weather = {
+            'temperature': '{}°'.format(round(weather_response['main']['temp'])),
+            'weather': weather_response['weather'][0]['id']
+        }
         # print(temperature, weather)
 
     def format_events(self, events):
@@ -402,12 +418,18 @@ class Draws():
             if line_height > EPD_HEIGHT:
                 break
 
+    def draw_weather(self):
+        print('draw weather')
+        temp_font = getFont(36, 'Regular')
+        temp_text = weather['temperature']
+        temp_text_w = temp_font.getsize(temp_text)[0]
+        temp_text_x = 624 - temp_text_w
+
+        draw.text((temp_text_x, 16), temp_text, font = temp_font, fill = 0)   # Temperature
+
 def render():
     # Render
-
-    draw.text((570, 16), 'Updated', font = getFont(12, 'Regular'))
-    draw.text((520, 32), datetime.datetime.now().strftime('%Y/%m/%d %H:%M'), font = getFont(12, 'Regular'))
-
+    draw.multiline_text((560, 56), 'Updated \n {} \n {}'.format(datetime.datetime.now().strftime('%Y/%m/%d'), datetime.datetime.now().strftime('%H:%M')), align = 'right', font = getFont(12, 'Regular'))
     epd.display_frame(epd.get_frame_buffer(image))
 
 if __name__ == '__main__':
