@@ -5,7 +5,9 @@ I've built an E-Ink Calendar Display to show my upcoming Google Calendar events 
 
 I had a [Raspberry Pi 3b](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) lying around that I wanted to do something with. Once I caught wind of the [Waveshare E-Ink Display](https://www.waveshare.com/7.5inch-e-paper-hat.htm), I thought this would be a great application for it.
 
-If you're unfamiliar with what an E-Ink display is, it is the same screen technology used in Amazon's Kindle devices. Its refresh rate is very slow, which does not make it ideal for showing quick imagery or videos; however, it doesn't need any current to maintain an image on its display. Think of it as a high-tech Etch-a-Sketch.
+E-Ink is the same screen technology used in Amazon's Kindle devices. E-Ink screens are composed of millions of tiny black & white particles, charged according to their color and resting just beneath the glass display screen. When exposed to a complex electric field, the particles are pulled towards or pushed away from the surface of the screen, resulting in variations of black and white pixels that compose an image. E-Ink displays don't need any current to maintain an image, which is one of their unique characteristics. Its refresh rate is very slow, however - taking seconds to render new images. This does not make them ideal for displaying videos or for high-frequency interaction like we have in phones. Read more abou E-Ink technology [here](https://www.eink.com/electronic-ink.html).
+
+Think of it as a high-tech Etch-a-Sketch!
 
 # Setup
 **Linux Dependencies**
