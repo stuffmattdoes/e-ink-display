@@ -8,48 +8,26 @@ I had a [Raspberry Pi 3b](https://www.raspberrypi.org/products/raspberry-pi-3-mo
 If you're unfamiliar with what an E-Ink display is, it is the same screen technology used in Amazon's Kindle devices. Its refresh rate is very slow, which does not make it ideal for showing quick imagery or videos; however, it doesn't need any current to maintain an image on its display. Think of it as a high-tech Etch-a-Sketch.
 
 # Setup
-## Linux Dependencies
+**Linux Dependencies**
 `sudo apt-get update` to update package list
-`sudo apt-get install` the following libraries:
-
-**Pillow dependencies**
+`sudo apt-get install` the following Linux libraries:
 * `libjpeg-dev`
 * `zlib1g-dev`
-<!-- - jpeg-dev
-- zlib-dev
-- freetype-dev
-- lcms2-dev
-- openjpeg-dev
-- tiff-dev
-- tk-dev
-- tcl-dev -->
 
-<!-- - python3-dev
-- python3-setuptools
-- libtiff4-dev
-- libjpeg8-dev
-- zlib1g-dev 
-- libfreetype6-dev
-- liblcms2-dev
-- libwebp-dev
-- tcl8.5-dev
-- tk8.5-dev
-- python-tk -->
-
-<!-- - python-dev -->
 **E-Ink Display dependencies**
-- python-smbus
-- python-serial
-- python-imaging
-- python-rpi.gpio
-- wiringpi
-- python-spidev
-- fonts-freefont-ttf
+- `python-smbus`
+- `python-serial`
+- `python-imaging`
+- `python-rpi.gpio`
+- `wiringpi`
+- `python-spidev`
 
 **Python Dependencies**
-- google-api-python-client
-- oauth2client
-- pillow
+`pip install` the following Python libraries:
+- `Pillow`
+- `RPi.GPIO`
+- `requests`
+- `spidev`
 
 # Resources
 * [WaveShare E-Ink 7.5" Display Wiki](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
@@ -62,8 +40,8 @@ If you're unfamiliar with what an E-Ink display is, it is the same screen techno
 # Cronjob
 `crontab -e`
 and enter
-`0 8-0 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
-to run a cronjob every hour from 8AM to midnight
+`0 8-23 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
+to run a cronjob every hour from 8AM to 11PM
 
 # TODO:
 * [ ] event['start']['dateTime'] & event['end']['dateTime'] may span a few days
