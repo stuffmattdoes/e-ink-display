@@ -9,7 +9,14 @@ E-Ink is the same screen technology used in Amazon's Kindle devices. E-Ink scree
 
 Think of it as a high-tech Etch-a-Sketch!
 
-# Setup
+## Specifications
+**Operating System:**
+Raspbian GNU/Linux 8 (jessie)
+
+**Python Version:**
+Python 3.4.2
+
+## Setup
 **Linux Dependencies**
 `sudo apt-get update` to update package list
 `sudo apt-get install` the following Linux libraries:
@@ -31,7 +38,13 @@ Think of it as a high-tech Etch-a-Sketch!
 - `requests`
 - `spidev`
 
-# Resources
+**Cronjob**
+`crontab -e`
+and enter
+`0 8-23 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
+to run a cronjob every hour from 8AM to 11PM
+
+## Resources
 * [WaveShare E-Ink 7.5" Display Wiki](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
 * [WaveShare E-Ink 7.5" Display Drivers](https://www.waveshare.com/wiki/Pioneer600#Libraries_Installation_for_RPi)
 * [Google Calendar API Authentication](https://developers.google.com/identity/protocols/OAuth2ForDevices#allowedscopes)
@@ -39,13 +52,7 @@ Think of it as a high-tech Etch-a-Sketch!
 * [openweathermap.org API](https://openweathermap.org/current#list)
 * [openweathermap.org Weather Conditions](https://openweathermap.org/weather-conditions)
 
-# Cronjob
-`crontab -e`
-and enter
-`0 8-23 * * * cd /home/pi/python_programs/pi-cal/src && python3 pi-cal.py`
-to run a cronjob every hour from 8AM to 11PM
-
-# TODO:
+## TODO:
 * [ ] event['start']['dateTime'] & event['end']['dateTime'] may span a few days
 * [ ] On multi-day event, if date is start day, display "Starts @ 7:30AM"
 * [ ] On multi-day event, if date is end day, display "Ends @ 10:30PM"
