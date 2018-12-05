@@ -1,17 +1,17 @@
 @font-face {
-  font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?y7ufmh');
-  src:  url('fonts/icomoon.eot?y7ufmh#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?y7ufmh') format('truetype'),
-    url('fonts/icomoon.woff?y7ufmh') format('woff'),
-    url('fonts/icomoon.svg?y7ufmh#icomoon') format('svg');
+  font-family: 'weather_icons';
+  src:  url('fonts/weather_icons.eot?y7ufmh');
+  src:  url('fonts/weather_icons.eot?y7ufmh#iefix') format('embedded-opentype'),
+    url('fonts/weather_icons.ttf?y7ufmh') format('truetype'),
+    url('fonts/weather_icons.woff?y7ufmh') format('woff'),
+    url('fonts/weather_icons.svg?y7ufmh#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
 
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon' !important;
+  font-family: 'weather_icons' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;

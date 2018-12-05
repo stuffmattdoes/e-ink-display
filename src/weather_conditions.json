@@ -172,43 +172,43 @@
     "7xx": "Atmosphere",
     "701": {
         "description": "mist",
-        "icon": ""
+        "icon": "\ue904"
     },
     "711": {
         "description": "smoke",
-        "icon": ""
+        "icon": "\ue904"
     },
     "721": {
         "description": "haze",
-        "icon": ""
+        "icon": "\ue904"
     },
     "731": {
         "description": "sand, dust whirls",
-        "icon": ""
+        "icon": "\ue904"
     },
     "741": {
         "description": "fog",
-        "icon": ""
+        "icon": "\ue904"
     },
     "751": {
         "description": "sand",
-        "icon": ""
+        "icon": "\ue904"
     },
     "761": {
         "description": "dust",
-        "icon": ""
+        "icon": "\ue904"
     },
     "762": {
         "description": "volcanic ash",
-        "icon": ""
+        "icon": "\ue904"
     },
     "771": {
         "description": "squalls",
-        "icon": ""
+        "icon": "\ue905"
     },
     "781": {
         "description": "tornado",
-        "icon": ""
+        "icon": "\ue905"
     },
     
     "8xx":  "Clear",
