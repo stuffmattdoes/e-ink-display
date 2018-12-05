@@ -33,18 +33,20 @@ def main():
         global creds
         creds = json.load(f)
 
-    # If we've authenticated before
     try:
+        # If we've authenticated before, we'll have a token.json file
         with open('./token.json') as f:
             global token
             token = f
             Auth().auth_refresh()
     except:
+        # Otherwise, we'll need to start a fresh authentication
         Auth.auth_request()
         Auth.auth_poll()
 
     draws = Draws()
     events = Events()
+
     events.fetch_events()
     events.fetch_weather()
     draws.draw_calendar()
@@ -86,11 +88,11 @@ class Auth:
         }).json()
 
         # response = {
-        #   'device_code': 'AH-1Ng1BzvzcVPXWrakudSRlaBkKTm5otqDWNT0u0p5J9mjXR1hMiS-rUS5D7Ss7LvDvAumcQReo_ME9N30vcEWiLbMQq0ORCw',
-        #   'expires_in': 1800,
-        #   'interval': 5,
-        #   'user_code': 'KQTW-SDMD',
-        #   'verification_url': 'https://www.google.com/device'
+        #   'device_code': 'AH-1Ng1BzvzcVPXWrakudSRlaBkKTm5otqDWNT0u0p5J9mjXR1hMiS-rUS5D7Ss7LvDvAumcQReo_ME9N30vcEWiLbMQq0ORCw',    # Code unique to device so user can distinguish between them for access granting/revoking
+        #   'expires_in': 1800,     # How long, in seconds, until the access token expires
+        #   'interval': 5,  # How long, in seconds, you should wait before re-polling auth URL for auth success response
+        #   'user_code': 'KQTW-SDMD',       # 
+        #   'verification_url': 'https://www.google.com/device'     # Never changes as far as I know
         # }
 
         device_code = auth_response['device_code']
@@ -108,11 +110,6 @@ class Auth:
     def auth_poll(self):
         print('auth poll')
         global creds
-        
-        # Poll Google API for auth confirmation token (after user accepts on separate device)
-        # interval = auth_response['interval']
-        interval = 30
-        time.sleep(interval)
 
         def request_token():
             # Token polling
@@ -125,12 +122,16 @@ class Auth:
 
         token_response = request_token()
 
-        # response = {
+        # token_response = {
         #     "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
         #     "expires_in":3920,
         #     "token_type":"Bearer",
         #     "refresh_token":"1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
         # }
+
+        # Poll Google API for auth confirmation token (after user accepts on separate device)
+        interval = auth_response['interval']
+        time.sleep(interval)
 
         i = 0
 
@@ -139,7 +140,7 @@ class Auth:
 
             if token_response.ok:
                 break
-            # elif token_response == 403 or token_response == 400
+            # elif token_response == 403 or token_response == 400:
             else:
                 time.sleep(interval)
                 i += interval
@@ -153,7 +154,7 @@ class Auth:
     def auth_refresh(self):
         print('auth refresh')
 
-        refresh_token = requests.post(creds['refresh_url'], data = {
+        access_token = requests.post(creds['refresh_url'], data = {
             'client_id': creds['client_id'],
             'client_secret': creds['client_secret'],
             'grant_type': 'refresh_token',
@@ -167,10 +168,10 @@ class Auth:
         # }
 
         global token
-        token = refresh_token
+        token = access_token
 
         with open('token.json', 'w') as fp:
-            json.dump(refresh_token, fp)
+            json.dump(access_token, fp)
 
         print('refresh successful!')
 
