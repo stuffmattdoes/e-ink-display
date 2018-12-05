@@ -238,7 +238,6 @@ class Events:
         return events_format
 
 def getFont(size, weight):
-    # return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/PlayfairDisplay-{}.ttf'.format(weight), size)
     return ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/OpenSans-{}.ttf'.format(weight), size)
 
 class Draws():    
@@ -420,16 +419,26 @@ class Draws():
 
     def draw_weather(self):
         print('draw weather')
+    
         temp_font = getFont(36, 'Regular')
         temp_text = weather['temperature']
         temp_text_w = temp_font.getsize(temp_text)[0]
-        temp_text_x = 624 - temp_text_w
+        temp_text_x = 580 - temp_text_w
+
+        with open('./weather_conditions.json') as f:
+            weather_conditions = json.load(f)
+
+        weather_font = ImageFont.truetype('/home/pi/python_programs/pi-cal/src/fonts/weather_icons/fonts/weather_icons.ttf', 36)
+        weather_icon = weather_conditions[str(weather['weather'])]['icon']
+        weather_icon_w = weather_font.getsize(weather_icon)[0]
+        weather_icon_x = 624 - weather_icon_w
 
         draw.text((temp_text_x, 16), temp_text, font = temp_font, fill = 0)   # Temperature
+        draw.text((weather_icon_x, 18), weather_icon, font = weather_font, fill = 0)     # Weather icon
 
 def render():
     # Render
-    draw.multiline_text((560, 56), 'Updated \n {} \n {}'.format(datetime.datetime.now().strftime('%Y/%m/%d'), datetime.datetime.now().strftime('%H:%M')), align = 'right', font = getFont(12, 'Regular'))
+    draw.multiline_text((560, 64), 'Updated \n {} \n {}'.format(datetime.datetime.now().strftime('%Y/%m/%d'), datetime.datetime.now().strftime('%H:%M')), align = 'right', font = getFont(12, 'Regular'))
     epd.display_frame(epd.get_frame_buffer(image))
 
 if __name__ == '__main__':
